@@ -7,16 +7,31 @@
     let todoState = [];
     let oldTodoState = [];
 
-    function addTodoToDom() {
-      
+    function addTodoToDom(todo) {
+      const todos = document.getElementById("todos");
+      const todoDiv = document.createElement("div");
+      todoDiv.id = todo.id;
+      const title = document.createElement("div");
+      title.innerHTML = todo.title;
+      const description = document.createElement("div");
+      description.innerHTML = todo.description;
+      todoDiv.appendChild(title);
+      todoDiv.appendChild(description);
+      todos.appendChild(todoDiv);
     }
 
     function removeTodoFromDom(todo) {
-      
+      const todos = document.getElementById("todos");
+      const todoDiv = document.getElementById(todo.id);
+      todos.removeChild(todoDiv);
     }
 
     function updateTodoInDom(oldTodo, newTodo) {
-        
+      const todoDiv = document.getElementById(oldTodo.id);
+      const title = todoDiv.children[0];
+      const description = todoDiv.children[1];
+      title.innerHTML = newTodo.title;
+      description.innerHTML = newTodo.description;
     }
 
     function updateState(newTodos) {
@@ -29,8 +44,40 @@
       const deleted = [];
       const updated = [];
       // calculate these 3 arrays
+      for (let i = 0; i < newTodos.length; i++) {
+        const newTodo = newTodos[i];
+        const oldTodo = oldTodoState.find((todo) => todo.id === newTodo.id);
+        if (oldTodo === undefined) {
+          added.push(newTodo);
+        } else if (oldTodo.title !== newTodo.title || oldTodo.description !== newTodo.description) {
+          updated.push(newTodo);
+        }
+
+        for (let i = 0; i < oldTodoState.length; i++) {
+          const oldTodo = oldTodoState[i];
+          const newTodo = newTodos.find((todo) => todo.id === oldTodo.id);
+          if (newTodo === undefined) {
+            deleted.push(oldTodo);
+          }
+        }
+      }
       // call addTodo, removeTodo, updateTodo functions on each of the
       // elements
+      for (let i = 0; i < added.length; i++) {
+        const todo = added[i];
+        addTodoToDom(todo);
+      }
+
+      for (let i = 0; i < deleted.length; i++) {
+        const todo = deleted[i];
+        removeTodoFromDom(todo);
+      }
+
+      for (let i = 0; i < updated.length; i++) {
+        const newTodo = updated[i];
+        const oldTodo = oldTodoState.find((todo) => todo.id === newTodo.id);
+        updateTodoInDom(oldTodo, newTodo);
+      }
       oldTodoState = newTodos;
     }
 
